@@ -1,5 +1,16 @@
+# -*- coding: utf-8 -*-
+from selenium import webdriver
+from selenium.webdriver.common.by import By
+from selenium.webdriver.common.keys import Keys
+from selenium.webdriver.support.ui import Select
+from selenium.common.exceptions import NoSuchElementException
+from selenium.common.exceptions import NoAlertPresentException
+import unittest, time, re, random
+
+
 from php4dvd.pages.page import Page
 from selenium.webdriver.common.by import By
+import unittest, time, re, random
 
 
 class InternalPage(Page):
@@ -32,3 +43,11 @@ class InternalPage(Page):
     @property
     def name_first_Film(self):
         return self.driver.find_element_by_xpath("/html/body/div[1]/div/div/section/div[3]/a[1]/div/div[1]/div")
+
+    @property
+    def film_name1(self):
+        return self.driver.find_element_by_xpath("/html/body/div[1]/div/div/section/div[3]/a[1]/div/div[1]/div")
+
+#    @property
+#    def current1_url(self):
+#        return self.base_url

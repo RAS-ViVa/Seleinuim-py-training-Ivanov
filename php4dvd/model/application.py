@@ -1,16 +1,18 @@
-from php4dvd.model.user import User
 from php4dvd.pages.internal_page import InternalPage
 from php4dvd.pages.login_page import LoginPage
 from php4dvd.pages.add_film_page import AddFilmPage
 from php4dvd.pages.info_film_page import InfoFilmPage
 from php4dvd.pages.inf_film_page import InfFilmPage
-from php4dvd.pages.user_profile_page import UserProfilePage
+from selenium.webdriver.support.expected_conditions import *
+from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
-from selenium.webdriver.support.expected_conditions import *
-from php4dvd.pages.user_management_page import UserManagementPage
-from selenium.webdriver.common.keys import Keys
-import time, re
+#import Selenium2Library
+import time
+
+from selenium import webdriver
+
+
 
 class Application(object):
     def __init__(self, driver, base_url):
@@ -26,10 +28,10 @@ class Application(object):
         self.internal_page.logout_button.click()
         self.wait.until(alert_is_present()).accept()
 
-#    def ensure_logout(self):
-#        element = self.wait.until(presence_of_element_located((By.CSS_SELECTOR, "nav, #loginform")))
-#        element.tag_name == "nav"
-#        self.logout()
+    def ensure_logout(self):
+        element = self.wait.until(presence_of_element_located((By.CSS_SELECTOR, "nav, #loginform")))
+        element.tag_name == "nav"
+        self.logout()
 
     def login(self, user):
         lp = self.login_page
@@ -59,32 +61,55 @@ class Application(object):
         afp.rating_field.send_keys(film.rating)
         afp.submit_button.click()
 
-        for i in range(900):
-            i=i+1
-        else: pass# self.fail("time out")
+        for i in range(60):
+            try:
+                if self.info_film_page.button_del_film: break
+            except: pass
+            time.sleep(1)
+        else: self.fail("time out")
+
+        self.info_film_page.home_button.click()
+ #       self.assertRegexpMatches(self.close_alert_and_get_its_text(), r"^[\s\S]*$")
+        for i in range(60):
+            try:
+                if self.internal_page.name_first_Film: break
+            except: pass
+            time.sleep(1)
+        else: self.fail("time out")
+
+
+
+
+#        for i in range(900):
+#            i=i+1
+#        else: pass# self.fail("time out")
 
         #self.fail("time out")
 
-        self.info_film_page.home_button.click()
-        for i in range(2000):
-            i=i+1
-        else: pass #self.fail("time out")
+#        self.info_film_page.home_button.click()
+#        for i in range(2000):
+#            i=i+1
+#        else: pass #self.fail("time out")
 
 
     def remove_film(self):
         self.internal_page.remove_film_link.click()
         rf = self.inf_film_page
         rf.is_this_page
+#        rf.is_this_page
         rf.button_del_film.click()
         self.wait.until(alert_is_present()).accept()
+        for i in range(60):
+            try:
+                if self.login_page.is_this_page: break
+            except: pass
+            time.sleep(1)
+        else: self.fail("time out")
 
-        for i in range(2000):
-            t=i+1
-        else: pass
 
 
-    def name_first_film(self):
-        return self.internal_page.find_element_by_xpath("/html/body/div[1]/div/div/section/div[3]/a[1]/div/div[1]/div")
+#    def name_first_film(self):
+#        return self.internal_page.find_element_by_xpath("/html/body/div[1]/div/div/section/div[3]/a[1]/div/div[1]/div")
 
     def sum_films_collection(self):
         return len(self.internal_page.is_films_collection)
@@ -98,19 +123,34 @@ class Application(object):
         else: pass
 
 
-    def name_first_film(self,NameSearchFilm):
-        return self.internal_page.find_element_by_xpath("/html/body/div[1]/div/div/section/div[3]/a[1]/div/div[1]/div")
-
     def command_Enter(self):
-        self.internal_page.find_element_by_id("q").send_keys(Keys.ENTER)
+        self.find_element_by_id("q").send_keys(Keys.ENTER)
         for i in range(1000):
             t=i+1
         else: pass
 
-    def search_film(self,wich_FilmSearch):
+
+    def search_film(self, wich_FilmSearch):
+        print (self.current_url)
+        self.internal_page.search_field.clear()
         self.internal_page.search_field.send_keys(wich_FilmSearch)
         self.internal_page.search_field.send_keys(Keys.ENTER)
-        for i in range(1000):
-            t=i+1
-        else: pass
-#        self.internal_page.find_element_by_id("q").send_keys(Keys.ENTER)
+
+        print (self.current_url)
+
+        for i in range(60):
+            try:
+                if str(self.current_url).find('/search/') > 0:break
+            except: pass
+            time.sleep(1)
+        else: self.fail("time out")
+
+        print (self.current_url)
+
+
+#    @property
+    def film_name(self):
+        return self.internal_page.film_name1.get_attribute("title")
+
+    def current2_url(self):
+        return self
